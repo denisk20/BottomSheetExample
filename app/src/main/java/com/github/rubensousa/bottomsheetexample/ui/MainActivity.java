@@ -1,7 +1,6 @@
 package com.github.rubensousa.bottomsheetexample.ui;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.ItemL
     private View mBottomSheet;
     private BottomSheetDialog mBottomSheetDialog;
     private BottomSheetBehavior mDialogBehavior;
+    private View bottomSheetDialogView;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.ItemL
         recyclerView.setAdapter(mAdapter);
 
         setSupportActionBar(toolbar);
+
+        initBottomSheetDialog();
     }
 
     @Override
@@ -117,10 +119,23 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.ItemL
             mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
 
-        View view = getLayoutInflater().inflate(R.layout.sheet, null);
-        view.findViewById(R.id.fakeShadow).setVisibility(View.GONE);
+        mDialogBehavior = BottomSheetBehavior.from((View) bottomSheetDialogView.getParent());
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        mBottomSheetDialog.show();
+//        mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialog) {
+//                mBottomSheetDialog = null;
+//            }
+//        });
+    }
+
+    @NonNull
+    private void initBottomSheetDialog() {
+        bottomSheetDialogView = getLayoutInflater().inflate(R.layout.sheet, null);
+        bottomSheetDialogView.findViewById(R.id.fakeShadow).setVisibility(View.GONE);
+
+        RecyclerView recyclerView = (RecyclerView) bottomSheetDialogView.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new ItemAdapter(createItems(), new ItemAdapter.ItemListener() {
@@ -131,16 +146,7 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.ItemL
         }));
 
         mBottomSheetDialog = new BottomSheetDialog(this);
-        mBottomSheetDialog.setContentView(view);
-        mDialogBehavior = BottomSheetBehavior.from((View) view.getParent());
-
-        mBottomSheetDialog.show();
-        mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                mBottomSheetDialog = null;
-            }
-        });
+        mBottomSheetDialog.setContentView(bottomSheetDialogView);
     }
 
     private void showBottomSheetDialogFullscreen() {
